@@ -12,6 +12,7 @@ package
 	import aerys.minko.scene.node.group.PickableGroup;
 	import aerys.minko.scene.node.group.StyleGroup;
 	import aerys.minko.scene.node.group.TransformGroup;
+	import aerys.minko.scene.node.group.jiglib.AbstractSkinGroup;
 	import aerys.minko.scene.node.group.jiglib.BoxSkinGroup;
 	import aerys.minko.scene.node.light.PointLight;
 	import aerys.minko.scene.node.mesh.IMesh;
@@ -32,10 +33,13 @@ package
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
+	import flash.media.SoundChannel;
+	import flash.media.SoundTransform;
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
 	
 	import jiglib.cof.JConfig;
+	import jiglib.events.JCollisionEvent;
 	import jiglib.geometry.JPlane;
 	
 	public class Main extends Sprite
@@ -43,13 +47,24 @@ package
 		[Embed("../assets/wall.png")]
 		private static const ASSET_WALL_DIFFUSE	: Class;
 
-		private static const CUBE_MESH			: IMesh		= new BVHMeshModifier(new NormalMeshModifier(CubeMesh.cubeMesh));
+		private static const PICKING_ENABLED	: Boolean	= true;
+		
+		private static const CUBE_MESH			: IMesh		= new NormalMeshModifier(CubeMesh.cubeMesh);
 		private static const CUBE_TEXTURE		: ITexture	= Loader3D.loadAsset(ASSET_WALL_DIFFUSE)[0] as ITexture;
 		
 		private static const MOUSE_SENSITIVITY	: Number	= .0015;
 		private static const WALK_SPEED			: Number	= .5;
-		private static const COLORS				: Array		= [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0x00ffff, 0xff00ff];
-	
+		private static const COLORS				: Array		= [0xff0000,
+															   0x00ff00,
+															   0x0000ff,
+															   0xffff00,
+															   0x00ffff,
+															   0xff00ff];
+		private static const SOUNDS				: Array		= [new ImpactPianoMonoC1(),
+															   new ImpactPianoMonoC2(),
+															   new ImpactPianoMonoC3(),
+															   new ImpactPianoMonoC4()];
+
 		private var _viewport	: Viewport			= new Viewport();
 		private var _camera		: FirstPersonCamera	= new FirstPersonCamera();
 		private var _cubes		: Group				= new Group();
@@ -61,13 +76,17 @@ package
 		private var _cursor		: Point				= new Point();
 		
 		private var _physics	: JiglibPhysics		= new JiglibPhysics(2.);
-
+		
+		private var _sound		: SoundChannel		= new SoundChannel();
+		
 		public function Main()
 		{
 			if (stage)
 				initialize();
 			else
 				addEventListener(Event.ADDED_TO_STAGE, initialize);
+		
+			new PU_PickingN().play(0., int.MAX_VALUE, new SoundTransform(.1));
 		}
 		
 		private function initialize(event : Event = null) : void
@@ -92,10 +111,10 @@ package
 		
 		private function enterFrameHandler(event : Event) : void
 		{
-			if (_viewport.visitors.length == 2)
+			if (_viewport.visitors.length == 2 && PICKING_ENABLED)
 			{
 				_viewport.visitors[2] = _viewport.visitors[1];
-				_viewport.visitors[1] = new PickingVisitor(2);
+				_viewport.visitors[1] = new PickingVisitor(5);
 			}
 			
 			var collisions : Boolean = false;
@@ -133,7 +152,7 @@ package
 		{
 			JConfig.solverType = "FAST";
 			//JConfig.doShockStep = true;
-			JConfig.angVelThreshold = 0.05;
+			JConfig.angVelThreshold = 0.01;
 			//JConfig.numPenetrationRelaxationTimesteps = 2;
 			
 			_viewport.antiAliasing = 8.;
@@ -188,36 +207,26 @@ package
 		
 		private function createCube(color : int = 0) : BoxSkinGroup
 		{
-			color ||= COLORS[int(COLORS.length * Math.random())];
+			var cube : LightCube = new LightCube(CUBE_TEXTURE, color);
 			
-			var light	: PointLight		= new PointLight(color, 1., 0., 0, ConstVector4.ZERO, 4.);
-			var cube	: TransformGroup	= new TransformGroup(CUBE_TEXTURE, CUBE_MESH, light);
-			var box		: BoxSkinGroup		= new BoxSkinGroup(5, 5, 5, cube);
+			_physics.system.addBody(cube.rigidBody);
 			
-			cube.name = "transformGroup";
-			
-			light.name = "light";
-			cube.transform.appendUniformScale(5.);
-		
-			box.rigidBody.x = -15. + Math.random() * 30.;
-			box.rigidBody.y = 50.;
-			box.rigidBody.z = -15. + Math.random() * 30.;
-			box.rigidBody.restitution = .5;
-			box.rigidBody.friction = .5;
-			
-			_physics.system.addBody(box.rigidBody);
-			
-			var pg : PickableGroup = new PickableGroup(box);
+			var pg : PickableGroup = new PickableGroup(cube);
 			
 			pg.useHandCursor = true;
 			pg.addEventListener(MouseEvent.CLICK, function(e : Event) : void
 			{
-				shoot(box);
+				shoot(cube);
 			});
-			
+						
 			_cubes.addChild(pg);
 			
-			return box;
+			return cube;
+		}
+		
+		private function collisionEndHandler(event : Event) : void
+		{
+			
 		}
 		
 		private function mouseMoveHandler(event : MouseEvent) : void
@@ -257,7 +266,7 @@ package
 				case Keyboard.ENTER :
 					if (_cubes.numChildren == 12)
 					{
-						_physics.system.removeBody(_cubes[0].box);
+						_physics.system.removeBody(_cubes[0][0].box);
 						_cubes.removeChildAt(0);
 					}
 					createCube();
@@ -273,7 +282,7 @@ package
 					break ;*/
 			}
 		}
-		
+	
 		private function shoot(box : BoxSkinGroup = null) : void
 		{
 			var minDistance 	: Number 		= box ? 0. : int.MAX_VALUE;
@@ -324,5 +333,6 @@ package
 					break ;
 			}
 		}
+		
 	}
 }
