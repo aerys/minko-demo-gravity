@@ -1,32 +1,30 @@
 package
 {
+	import aerys.minko.Minko;
 	import aerys.minko.render.Viewport;
 	import aerys.minko.render.effect.basic.BasicStyle;
 	import aerys.minko.render.effect.light.LightingStyle;
 	import aerys.minko.render.effect.lighting.LightingEffect;
 	import aerys.minko.render.renderer.state.TriangleCulling;
-	import aerys.minko.scene.node.Loader3D;
+	import aerys.minko.scene.node.group.LoaderGroup;
 	import aerys.minko.scene.node.Model;
 	import aerys.minko.scene.node.camera.FirstPersonCamera;
 	import aerys.minko.scene.node.group.Group;
 	import aerys.minko.scene.node.group.PickableGroup;
 	import aerys.minko.scene.node.group.StyleGroup;
-	import aerys.minko.scene.node.group.TransformGroup;
-	import aerys.minko.scene.node.group.jiglib.AbstractSkinGroup;
 	import aerys.minko.scene.node.group.jiglib.BoxSkinGroup;
 	import aerys.minko.scene.node.light.PointLight;
 	import aerys.minko.scene.node.mesh.IMesh;
-	import aerys.minko.scene.node.mesh.modifier.BVHMeshModifier;
+	import aerys.minko.scene.node.mesh.modifier.ColorMeshModifier;
 	import aerys.minko.scene.node.mesh.modifier.NormalMeshModifier;
 	import aerys.minko.scene.node.mesh.primitive.CubeMesh;
-	import aerys.minko.scene.node.texture.ColorTexture;
 	import aerys.minko.scene.node.texture.ITexture;
 	import aerys.minko.scene.visitor.PickingVisitor;
 	import aerys.minko.type.jiglib.JiglibPhysics;
-	import aerys.minko.type.math.ConstVector4;
+	import aerys.minko.type.log.DebugLevel;
 	import aerys.minko.type.math.Vector4;
 	import aerys.monitor.Monitor;
-	
+
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
@@ -39,7 +37,6 @@ package
 	import flash.utils.getTimer;
 	
 	import jiglib.cof.JConfig;
-	import jiglib.events.JCollisionEvent;
 	import jiglib.geometry.JPlane;
 	
 	public class Main extends Sprite
@@ -50,7 +47,7 @@ package
 		private static const PICKING_ENABLED	: Boolean	= true;
 		
 		private static const CUBE_MESH			: IMesh		= new NormalMeshModifier(CubeMesh.cubeMesh);
-		private static const CUBE_TEXTURE		: ITexture	= Loader3D.loadAsset(ASSET_WALL_DIFFUSE)[0] as ITexture;
+		private static const CUBE_TEXTURE		: ITexture	= LoaderGroup.loadAsset(ASSET_WALL_DIFFUSE)[0] as ITexture;
 		
 		private static const MOUSE_SENSITIVITY	: Number	= .0015;
 		private static const WALK_SPEED			: Number	= .5;
@@ -81,6 +78,8 @@ package
 		
 		public function Main()
 		{
+			Minko.debugLevel = DebugLevel.SHADER_AGAL;
+			
 			if (stage)
 				initialize();
 			else
@@ -111,7 +110,7 @@ package
 		
 		private function enterFrameHandler(event : Event) : void
 		{
-			if (_viewport.visitors.length == 2 && PICKING_ENABLED)
+			if (_viewport.visitors && _viewport.visitors.length == 2 && PICKING_ENABLED)
 			{
 				_viewport.visitors[2] = _viewport.visitors[1];
 				_viewport.visitors[1] = new PickingVisitor(5);
@@ -157,13 +156,13 @@ package
 			
 			_viewport.antiAliasing = 8.;
 			_viewport.defaultEffect = new LightingEffect();
-			addChild(_viewport);
+			stage.addChild(_viewport);
 		
 			_camera.position.y = 10.;
 			_camera.position.z = -20.;
 			_camera.rotation.x = -.3;
 			
-			var walls	: Model		= new Model(CUBE_MESH, ColorTexture.GREY);
+			var walls	: Model		= new Model(new ColorMeshModifier(CUBE_MESH, Vector.<uint>([0x7f7f7f])));
 			
 			walls.style.set(BasicStyle.TRIANGLE_CULLING, TriangleCulling.FRONT);
 			walls.transform.appendUniformScale(100)
