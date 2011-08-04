@@ -67,7 +67,7 @@ package
 			rigidBody.x = -15. + Math.random() * 30.;
 			rigidBody.y = 50.;
 			rigidBody.z = -15. + Math.random() * 30.;
-			rigidBody.restitution = .5;
+//			rigidBody.restitution = .5;
 			rigidBody.friction = .5;
 			rigidBody.addEventListener(JCollisionEvent.COLLISION_START, collisionStartHandler);
 		}

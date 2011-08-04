@@ -5,11 +5,13 @@ package
 	import aerys.minko.render.effect.basic.BasicStyle;
 	import aerys.minko.render.effect.light.LightingStyle;
 	import aerys.minko.render.effect.lighting.LightingEffect;
+	import aerys.minko.render.renderer.DefaultRenderer;
+	import aerys.minko.render.renderer.DirectRenderer;
 	import aerys.minko.render.renderer.state.TriangleCulling;
-	import aerys.minko.scene.node.group.LoaderGroup;
 	import aerys.minko.scene.node.Model;
 	import aerys.minko.scene.node.camera.FirstPersonCamera;
 	import aerys.minko.scene.node.group.Group;
+	import aerys.minko.scene.node.group.LoaderGroup;
 	import aerys.minko.scene.node.group.PickableGroup;
 	import aerys.minko.scene.node.group.StyleGroup;
 	import aerys.minko.scene.node.group.jiglib.BoxSkinGroup;
@@ -24,7 +26,7 @@ package
 	import aerys.minko.type.log.DebugLevel;
 	import aerys.minko.type.math.Vector4;
 	import aerys.monitor.Monitor;
-
+	
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
@@ -47,7 +49,8 @@ package
 		private static const PICKING_ENABLED	: Boolean	= true;
 		
 		private static const CUBE_MESH			: IMesh		= new NormalMeshModifier(CubeMesh.cubeMesh);
-		private static const CUBE_TEXTURE		: ITexture	= LoaderGroup.loadAsset(ASSET_WALL_DIFFUSE)[0] as ITexture;
+		private static const CUBE_TEXTURE		: ITexture	= new LoaderGroup().loadAsset(ASSET_WALL_DIFFUSE)[0]
+															  as ITexture;
 		
 		private static const MOUSE_SENSITIVITY	: Number	= .0015;
 		private static const WALK_SPEED			: Number	= .5;
@@ -78,7 +81,7 @@ package
 		
 		public function Main()
 		{
-			Minko.debugLevel = DebugLevel.SHADER_AGAL;
+			Minko.debugLevel = DebugLevel.RENDERER;
 			
 			if (stage)
 				initialize();
@@ -151,7 +154,7 @@ package
 		{
 			JConfig.solverType = "FAST";
 			//JConfig.doShockStep = true;
-			JConfig.angVelThreshold = 0.01;
+			JConfig.angVelThreshold = 0.05;
 			//JConfig.numPenetrationRelaxationTimesteps = 2;
 			
 			_viewport.antiAliasing = 8.;
@@ -217,7 +220,7 @@ package
 			{
 				shoot(cube);
 			});
-						
+			
 			_cubes.addChild(pg);
 			
 			return cube;
