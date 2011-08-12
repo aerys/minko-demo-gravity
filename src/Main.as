@@ -49,7 +49,7 @@ package
 		private static const PICKING_ENABLED	: Boolean	= true;
 		
 		private static const CUBE_MESH			: IMesh		= new NormalMeshModifier(CubeMesh.cubeMesh);
-		private static const CUBE_TEXTURE		: ITexture	= new LoaderGroup().loadAsset(ASSET_WALL_DIFFUSE)[0]
+		private static const CUBE_TEXTURE		: ITexture	= new LoaderGroup().loadClass(ASSET_WALL_DIFFUSE)[0]
 															  as ITexture;
 		
 		private static const MOUSE_SENSITIVITY	: Number	= .0015;
