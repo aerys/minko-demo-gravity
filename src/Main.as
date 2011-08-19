@@ -3,8 +3,8 @@ package
 	import aerys.minko.Minko;
 	import aerys.minko.render.Viewport;
 	import aerys.minko.render.effect.basic.BasicStyle;
-	import aerys.minko.render.effect.light.LightingStyle;
 	import aerys.minko.render.effect.lighting.LightingEffect;
+	import aerys.minko.render.effect.lighting.LightingStyle;
 	import aerys.minko.render.renderer.DefaultRenderer;
 	import aerys.minko.render.renderer.DirectRenderer;
 	import aerys.minko.render.renderer.state.TriangleCulling;
@@ -68,8 +68,7 @@ package
 		private var _viewport	: Viewport			= new Viewport();
 		private var _camera		: FirstPersonCamera	= new FirstPersonCamera();
 		private var _cubes		: Group				= new Group();
-		private var _light		: PointLight		= new PointLight(0xffffff, .1, 0, 0, new Vector4(0., 10., 0.), 50.);
-		//private var _light		: SpotLight			= new SpotLight(0xffffff, 0.1, 0., 128, new Vector4(20, 20, 20), 0, new Vector4(-1, -1, -1), 1., 0.4, 2048);
+		private var _light		: PointLight		= new PointLight(0xffffff, .08, 0, 0, new Vector4(0., 10., 0.), 50.);
 		private var _scene		: StyleGroup		= new StyleGroup(_camera, _light, _cubes);
 	
 		private var _speed		: Point				= new Point();
@@ -142,6 +141,9 @@ package
 		
 		private function initializePhysics() : void
 		{
+			JConfig.solverType = "FAST";
+			JConfig.angVelThreshold = 0.05;
+
 			_physics.system.addBody(new JPlane(null, new Vector3D(0., 1., 0., 0.)));
 			_physics.system.addBody(new JPlane(null, new Vector3D(0., -1., 0., -100.)));
 			_physics.system.addBody(new JPlane(null, new Vector3D(1., 0., 0., -50.)));
@@ -152,11 +154,6 @@ package
 		
 		private function initializeScene() : void
 		{
-			JConfig.solverType = "FAST";
-			//JConfig.doShockStep = true;
-			JConfig.angVelThreshold = 0.05;
-			//JConfig.numPenetrationRelaxationTimesteps = 2;
-			
 			_viewport.antiAliasing = 8.;
 			_viewport.defaultEffect = new LightingEffect();
 			stage.addChild(_viewport);
@@ -165,6 +162,12 @@ package
 			_camera.position.z = -20.;
 			_camera.rotation.x = -.3;
 			
+			initializeWalls();
+			initializeCubes();
+		}
+		
+		private function initializeWalls() : void
+		{
 			var walls	: Model		= new Model(new ColorMeshModifier(CUBE_MESH, Vector.<uint>([0x7f7f7f])));
 			
 			walls.style.set(BasicStyle.TRIANGLE_CULLING, TriangleCulling.FRONT);
@@ -172,7 +175,10 @@ package
 						   .appendTranslation(0., 50., 0.);
 		
 			_scene.addChild(walls);
+		}
 		
+		private function initializeCubes() : void
+		{
 			// cubes
 			var cube : BoxSkinGroup = createCube(0x00ff00);
 		
@@ -195,9 +201,7 @@ package
 			cube.box.y = 2.5;
 			cube.box.z = 2.5;
 			
-			_scene.style.set(LightingStyle.LIGHT_ENABLED, 	true)
-						.set(LightingStyle.CAST_SHADOWS,	true)
-						.set(LightingStyle.RECEIVE_SHADOWS,	true);
+			_scene.style.set(LightingStyle.LIGHT_ENABLED, 	true);
 		}
 		
 		private function initializeInputs() : void
@@ -209,11 +213,16 @@ package
 		
 		private function createCube(color : int = 0) : BoxSkinGroup
 		{
-			var cube : LightCube = new LightCube(CUBE_TEXTURE, color);
+			if (_cubes.numChildren == 12)
+			{
+				_physics.system.removeBody(_cubes[0][0].box);
+				_cubes.removeChildAt(0);
+			}
+			
+			var cube 	: LightCube 	= new LightCube(CUBE_TEXTURE, color);
+			var pg 		: PickableGroup = new PickableGroup(cube);
 			
 			_physics.system.addBody(cube.rigidBody);
-			
-			var pg : PickableGroup = new PickableGroup(cube);
 			
 			pg.useHandCursor = true;
 			pg.addEventListener(MouseEvent.CLICK, function(e : Event) : void
@@ -224,11 +233,6 @@ package
 			_cubes.addChild(pg);
 			
 			return cube;
-		}
-		
-		private function collisionEndHandler(event : Event) : void
-		{
-			
 		}
 		
 		private function mouseMoveHandler(event : MouseEvent) : void
@@ -266,22 +270,11 @@ package
 					_speed.y = -WALK_SPEED;
 					break ;
 				case Keyboard.ENTER :
-					if (_cubes.numChildren == 12)
-					{
-						_physics.system.removeBody(_cubes[0][0].box);
-						_cubes.removeChildAt(0);
-					}
 					createCube();
 					break ;
 				case Keyboard.SPACE :
 					shoot();
 					break ;
-				/*case Keyboard.D :
-					var dof : Boolean = _scene.style.get(DepthOfFieldStyle.DOF_ENABLED)
-										as Boolean;
-										
-					_scene.style.set(DepthOfFieldStyle.DOF_ENABLED, !dof);
-					break ;*/
 			}
 		}
 	

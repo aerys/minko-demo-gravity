@@ -54,7 +54,7 @@ package
 		{
 			color ||= COLORS[int(COLORS.length * Math.random())];
 			
-			var light	: PointLight		= new PointLight(color, 1., 0., 0, ConstVector4.ZERO, 4.);
+			var light	: PointLight		= new PointLight(color, 1., 0., 0, ConstVector4.ZERO, 4.5);
 			var cube	: TransformGroup	= new TransformGroup(texture, CUBE_MESH, light);
 			
 			_sound = SOUNDS[int(Math.random() * SOUNDS.length)];
@@ -67,7 +67,6 @@ package
 			rigidBody.x = -15. + Math.random() * 30.;
 			rigidBody.y = 50.;
 			rigidBody.z = -15. + Math.random() * 30.;
-//			rigidBody.restitution = .5;
 			rigidBody.friction = .5;
 			rigidBody.addEventListener(JCollisionEvent.COLLISION_START, collisionStartHandler);
 		}
@@ -82,12 +81,6 @@ package
 			_lastCollision = t;
 			_numPlayingSounds++;
 			
-			if (_channel)
-			{
-			/*	eaze(_channel).to(.5, {volume: 0})
-							  .onComplete(_channel.stop)
-							  .onComplete(soundCompleteHandler);*/
-			}
 			_channel = _sound.play(0, 0, new SoundTransform(.1));
 			if (_channel)
 			{
