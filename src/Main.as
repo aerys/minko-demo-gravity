@@ -5,8 +5,6 @@ package
 	import aerys.minko.render.effect.basic.BasicStyle;
 	import aerys.minko.render.effect.lighting.LightingEffect;
 	import aerys.minko.render.effect.lighting.LightingStyle;
-	import aerys.minko.render.renderer.DefaultRenderer;
-	import aerys.minko.render.renderer.DirectRenderer;
 	import aerys.minko.render.renderer.state.TriangleCulling;
 	import aerys.minko.scene.node.Model;
 	import aerys.minko.scene.node.camera.FirstPersonCamera;
@@ -94,8 +92,6 @@ package
 		{
 			removeEventListener(Event.ENTER_FRAME, initialize);
 		
-			stage.frameRate = 60.;
-			
 			initializeMonitor();
 			initializeScene();
 			initializePhysics();
@@ -180,26 +176,10 @@ package
 		private function initializeCubes() : void
 		{
 			// cubes
-			var cube : BoxSkinGroup = createCube(0x00ff00);
-		
-			cube.box.x = 2.5;
-			cube.box.y = 2.5;
-			cube.box.z = 2.5;
-			
-			cube = createCube(0xff0000);
-			cube.box.x = 2.5;
-			cube.box.y = 2.5;
-			cube.box.z = -2.5;
-			
-			cube = createCube(0x0000ff);
-			cube.box.x = -2.5;
-			cube.box.y = 2.5;
-			cube.box.z = -2.5;
-			
-			cube = createCube(0xffff00);
-			cube.box.x = -2.5;
-			cube.box.y = 2.5;
-			cube.box.z = 2.5;
+			createCube(0x00ff00, 2.5, 2.5, 2.5);
+			createCube(0xff0000, 2.5, 2.5, -2.5);
+			createCube(0x0000ff, -2.5, 2.5, -2.5);
+			createCube(0xffff00, -2.5, 2.5, 2.5);
 			
 			_scene.style.set(LightingStyle.LIGHT_ENABLED, 	true);
 		}
@@ -211,8 +191,12 @@ package
 			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler);
 		}
 		
-		private function createCube(color : int = 0) : BoxSkinGroup
+		private function createCube(color 	: int 		= 0,
+									x 		: Number	= NaN,
+									y 		: Number	= NaN,
+									z 		: Number 	= NaN) : BoxSkinGroup
 		{
+			// make sure we don't have more thant 12 cubes
 			if (_cubes.numChildren == 12)
 			{
 				_physics.system.removeBody(_cubes[0][0].box);
@@ -221,6 +205,10 @@ package
 			
 			var cube 	: LightCube 	= new LightCube(CUBE_TEXTURE, color);
 			var pg 		: PickableGroup = new PickableGroup(cube);
+			
+			cube.box.x = isNaN(x) ? -15. + Math.random() * 30. : x;
+			cube.box.y = isNaN(y) ? 50. : y;
+			cube.box.z = isNaN(z) ? -15. + Math.random() * 30. : z;
 			
 			_physics.system.addBody(cube.rigidBody);
 			

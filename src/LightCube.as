@@ -64,9 +64,6 @@ package
 			light.name = "light";
 			cube.transform.appendUniformScale(5.);
 		
-			rigidBody.x = -15. + Math.random() * 30.;
-			rigidBody.y = 50.;
-			rigidBody.z = -15. + Math.random() * 30.;
 			rigidBody.friction = .5;
 			rigidBody.addEventListener(JCollisionEvent.COLLISION_START, collisionStartHandler);
 		}
