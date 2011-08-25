@@ -94,7 +94,7 @@ package
 		{
 			removeEventListener(Event.ENTER_FRAME, initialize);
 		
-			stage.frameRate = 45.;
+			stage.frameRate = 60.;
 			
 			initializeMonitor();
 			initializeScene();
@@ -264,10 +264,10 @@ package
 					_speed.x = -WALK_SPEED;
 					break ;
 				case Keyboard.LEFT :
-					_speed.y = WALK_SPEED;
+					_speed.y = -WALK_SPEED;
 					break ;
 				case Keyboard.RIGHT :
-					_speed.y = -WALK_SPEED;
+					_speed.y = WALK_SPEED;
 					break ;
 				case Keyboard.ENTER :
 					createCube();
