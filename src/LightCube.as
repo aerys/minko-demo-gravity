@@ -54,7 +54,7 @@ package
 		{
 			color ||= COLORS[int(COLORS.length * Math.random())];
 			
-			var light	: PointLight		= new PointLight(color, 1., 0., 0, ConstVector4.ZERO, 4.5);
+			var light	: PointLight		= new PointLight(color, 1.2, 0., 0, ConstVector4.ZERO, 4.5);
 			var cube	: TransformGroup	= new TransformGroup(texture, CUBE_MESH, light);
 			
 			_sound = SOUNDS[int(Math.random() * SOUNDS.length)];

@@ -8,6 +8,7 @@ package
 	import aerys.minko.render.renderer.state.TriangleCulling;
 	import aerys.minko.scene.node.Model;
 	import aerys.minko.scene.node.camera.FirstPersonCamera;
+	import aerys.minko.scene.node.group.EffectGroup;
 	import aerys.minko.scene.node.group.Group;
 	import aerys.minko.scene.node.group.LoaderGroup;
 	import aerys.minko.scene.node.group.PickableGroup;
@@ -26,6 +27,7 @@ package
 	import aerys.monitor.Monitor;
 	
 	import flash.display.Sprite;
+	import flash.display.StageDisplayState;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
@@ -65,8 +67,8 @@ package
 
 		private var _viewport	: Viewport			= new Viewport();
 		private var _camera		: FirstPersonCamera	= new FirstPersonCamera();
-		private var _cubes		: Group				= new Group();
-		private var _light		: PointLight		= new PointLight(0xffffff, .08, 0, 0, new Vector4(0., 10., 0.), 50.);
+		private var _cubes		: EffectGroup		= new EffectGroup();
+		private var _light		: PointLight		= new PointLight(0xffffff, .04, 0, 0, new Vector4(0., 10., 0.), 50.);
 		private var _scene		: StyleGroup		= new StyleGroup(_camera, _light, _cubes);
 	
 		private var _speed		: Point				= new Point();
@@ -78,8 +80,6 @@ package
 		
 		public function Main()
 		{
-			Minko.debugLevel = DebugLevel.RENDERER;
-			
 			if (stage)
 				initialize();
 			else
@@ -97,42 +97,22 @@ package
 			initializePhysics();
 			initializeInputs();
 			
+			stage.frameRate = 60.;
+			
 			addEventListener(Event.ENTER_FRAME, enterFrameHandler);
 		}
 		
 		private function initializeMonitor() : void
 		{
-			Monitor.monitor.watch(_viewport, ["renderingTime", "drawingTime", "numTriangles"]);
+			Monitor.monitor.watch(_viewport, ["renderMode", "renderingTime", "drawingTime", "numTriangles"]);
+			Monitor.monitor.visible = false;
 			addChild(Monitor.monitor);
 		}
 		
-		private function enterFrameHandler(event : Event) : void
+		private function viewportInitHandler(event : Event) : void
 		{
-			if (_viewport.visitors && _viewport.visitors.length == 2 && PICKING_ENABLED)
-			{
-				_viewport.visitors[2] = _viewport.visitors[1];
-				_viewport.visitors[1] = new PickingVisitor(5);
-			}
-			
-			var collisions : Boolean = false;
-			
-			for (var i : int = 0; i < _cubes.numChildren; ++i)
-				_cubes[i]..light.diffuse = .5 + Math.sin(i + getTimer() * .001) * .5;
-			
-			_physics.update();
-			
-			_camera.walk(_speed.x);
-			_camera.strafe(_speed.y);
-			if (_camera.position.x > 45.)
-				_camera.position.x = 45.;
-			else if (_camera.position.x < -45.)
-				_camera.position.x = -45.;
-			if (_camera.position.z > 45.)
-				_camera.position.z = 45.;
-			else if (_camera.position.z < -45.)
-				_camera.position.z = -45.;
-						
-			_viewport.render(_scene);
+			_viewport.visitors[2] = _viewport.visitors[1];
+			_viewport.visitors[1] = new PickingVisitor(5);
 		}
 		
 		private function initializePhysics() : void
@@ -152,6 +132,7 @@ package
 		{
 			_viewport.antiAliasing = 8.;
 			_viewport.defaultEffect = new LightingEffect();
+			_viewport.addEventListener(Event.INIT, viewportInitHandler);
 			stage.addChild(_viewport);
 		
 			_camera.position.y = 10.;
@@ -175,6 +156,8 @@ package
 		
 		private function initializeCubes() : void
 		{
+			_cubes.effect = new LightCubeEffect();
+			
 			// cubes
 			createCube(0x00ff00, 2.5, 2.5, 2.5);
 			createCube(0xff0000, 2.5, 2.5, -2.5);
@@ -263,6 +246,15 @@ package
 				case Keyboard.SPACE :
 					shoot();
 					break ;
+				case Keyboard.F2 :
+					Monitor.monitor.visible = !Monitor.monitor.visible;
+					break ;
+				case Keyboard.F :
+					if (stage.displayState == StageDisplayState.NORMAL)
+						stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+					else
+						stage.displayState = StageDisplayState.NORMAL;
+					break ;
 			}
 		}
 	
@@ -315,6 +307,29 @@ package
 					_speed.y = 0.;
 					break ;
 			}
+		}
+		
+		private function enterFrameHandler(event : Event) : void
+		{
+			var collisions : Boolean = false;
+			
+			for (var i : int = 0; i < _cubes.numChildren; ++i)
+				_cubes[i]..light.diffuse = .5 + Math.sin(i + getTimer() * .001) * .5;
+			
+			_physics.update();
+			
+			_camera.walk(_speed.x);
+			_camera.strafe(_speed.y);
+			if (_camera.position.x > 45.)
+				_camera.position.x = 45.;
+			else if (_camera.position.x < -45.)
+				_camera.position.x = -45.;
+			if (_camera.position.z > 45.)
+				_camera.position.z = 45.;
+			else if (_camera.position.z < -45.)
+				_camera.position.z = -45.;
+			
+			_viewport.render(_scene);
 		}
 		
 	}
