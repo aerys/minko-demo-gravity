@@ -1,18 +1,19 @@
 package
 {
 	import aerys.minko.render.RenderTarget;
+	import aerys.minko.render.effect.IRenderingEffect;
 	import aerys.minko.render.effect.SinglePassEffect;
 	import aerys.minko.render.effect.basic.BasicStyle;
 	import aerys.minko.render.shader.SValue;
 	import aerys.minko.scene.data.LightData;
-	import aerys.minko.scene.data.LocalData;
 	import aerys.minko.scene.data.StyleStack;
+	import aerys.minko.scene.data.TransformData;
 	import aerys.minko.scene.data.WorldDataList;
 	
 	import flash.events.PressAndTapGestureEvent;
 	import flash.utils.Dictionary;
 	
-	public class LightCubeEffect extends SinglePassEffect
+	public class LightCubeEffect extends SinglePassEffect implements IRenderingEffect
 	{
 		override protected function getOutputColor() : SValue
 		{
@@ -51,11 +52,11 @@ package
 			return vertexClipspacePosition;
 		}
 		
-		override protected function getDataHash(style	: StyleStack,
-												local	: LocalData,
-												world	: Dictionary) : String
+		override public function getDataHash(styleData		: StyleStack,
+											 transformData	: TransformData,
+											 worldData		: Dictionary) : String
 		{
-			return (world[LightData] as WorldDataList).length.toString(16);
+			return (worldData[LightData] as WorldDataList).length.toString(16);
 		}
 	}
 }

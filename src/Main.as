@@ -5,6 +5,7 @@ package
 	import aerys.minko.render.effect.basic.BasicStyle;
 	import aerys.minko.render.effect.lighting.LightingEffect;
 	import aerys.minko.render.effect.lighting.LightingStyle;
+	import aerys.minko.render.renderer.state.Blending;
 	import aerys.minko.render.renderer.state.TriangleCulling;
 	import aerys.minko.scene.node.Model;
 	import aerys.minko.scene.node.camera.FirstPersonCamera;
@@ -67,8 +68,8 @@ package
 
 		private var _viewport	: Viewport			= new Viewport();
 		private var _camera		: FirstPersonCamera	= new FirstPersonCamera();
-		private var _cubes		: EffectGroup		= new EffectGroup();
-		private var _light		: PointLight		= new PointLight(0xffffff, .04, 0, 0, new Vector4(0., 10., 0.), 50.);
+		private var _cubes		: EffectGroup		= new EffectGroup(new LightCubeEffect());
+		private var _light		: PointLight		= new PointLight(0xffffff, .08, 0, 0, new Vector4(0., 10., 0.), 50.);
 		private var _scene		: StyleGroup		= new StyleGroup(_camera, _light, _cubes);
 	
 		private var _speed		: Point				= new Point();
@@ -156,8 +157,6 @@ package
 		
 		private function initializeCubes() : void
 		{
-			_cubes.effect = new LightCubeEffect();
-			
 			// cubes
 			createCube(0x00ff00, 2.5, 2.5, 2.5);
 			createCube(0xff0000, 2.5, 2.5, -2.5);
@@ -241,10 +240,10 @@ package
 					_speed.y = WALK_SPEED;
 					break ;
 				case Keyboard.ENTER :
-					createCube();
+					shoot();
 					break ;
 				case Keyboard.SPACE :
-					shoot();
+					createCube();
 					break ;
 				case Keyboard.F2 :
 					Monitor.monitor.visible = !Monitor.monitor.visible;
