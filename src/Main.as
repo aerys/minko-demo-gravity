@@ -2,16 +2,16 @@ package
 {
 	import aerys.minko.Minko;
 	import aerys.minko.render.Viewport;
+	import aerys.minko.render.effect.SinglePassEffect;
 	import aerys.minko.render.effect.basic.BasicStyle;
 	import aerys.minko.render.effect.lighting.LightingEffect;
 	import aerys.minko.render.effect.lighting.LightingStyle;
-	import aerys.minko.render.renderer.state.Blending;
-	import aerys.minko.render.renderer.state.TriangleCulling;
 	import aerys.minko.scene.node.Model;
 	import aerys.minko.scene.node.camera.FirstPersonCamera;
 	import aerys.minko.scene.node.group.EffectGroup;
 	import aerys.minko.scene.node.group.Group;
 	import aerys.minko.scene.node.group.LoaderGroup;
+	import aerys.minko.scene.node.group.MaterialGroup;
 	import aerys.minko.scene.node.group.PickableGroup;
 	import aerys.minko.scene.node.group.StyleGroup;
 	import aerys.minko.scene.node.group.jiglib.BoxSkinGroup;
@@ -22,6 +22,8 @@ package
 	import aerys.minko.scene.node.mesh.primitive.CubeMesh;
 	import aerys.minko.scene.node.texture.ITexture;
 	import aerys.minko.scene.visitor.PickingVisitor;
+	import aerys.minko.type.enum.Blending;
+	import aerys.minko.type.enum.TriangleCulling;
 	import aerys.minko.type.jiglib.JiglibPhysics;
 	import aerys.minko.type.log.DebugLevel;
 	import aerys.minko.type.math.Vector4;
@@ -68,7 +70,7 @@ package
 
 		private var _viewport	: Viewport			= new Viewport();
 		private var _camera		: FirstPersonCamera	= new FirstPersonCamera();
-		private var _cubes		: EffectGroup		= new EffectGroup(new LightCubeEffect());
+		private var _cubes		: MaterialGroup		= new MaterialGroup(new LightCubeEffect(), CUBE_TEXTURE);
 		private var _light		: PointLight		= new PointLight(0xffffff, .08, 0, 0, new Vector4(0., 10., 0.), 50.);
 		private var _scene		: StyleGroup		= new StyleGroup(_camera, _light, _cubes);
 	
@@ -185,7 +187,7 @@ package
 				_cubes.removeChildAt(0);
 			}
 			
-			var cube 	: LightCube 	= new LightCube(CUBE_TEXTURE, color);
+			var cube 	: LightCube 	= new LightCube(color);
 			var pg 		: PickableGroup = new PickableGroup(cube);
 			
 			cube.box.x = isNaN(x) ? -15. + Math.random() * 30. : x;
