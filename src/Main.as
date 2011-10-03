@@ -1,15 +1,11 @@
 package
 {
-	import aerys.minko.Minko;
 	import aerys.minko.render.Viewport;
-	import aerys.minko.render.effect.SinglePassEffect;
 	import aerys.minko.render.effect.basic.BasicStyle;
 	import aerys.minko.render.effect.lighting.LightingEffect;
 	import aerys.minko.render.effect.lighting.LightingStyle;
 	import aerys.minko.scene.node.Model;
 	import aerys.minko.scene.node.camera.FirstPersonCamera;
-	import aerys.minko.scene.node.group.EffectGroup;
-	import aerys.minko.scene.node.group.Group;
 	import aerys.minko.scene.node.group.LoaderGroup;
 	import aerys.minko.scene.node.group.MaterialGroup;
 	import aerys.minko.scene.node.group.PickableGroup;
@@ -22,10 +18,8 @@ package
 	import aerys.minko.scene.node.mesh.primitive.CubeMesh;
 	import aerys.minko.scene.node.texture.ITexture;
 	import aerys.minko.scene.visitor.PickingVisitor;
-	import aerys.minko.type.enum.Blending;
 	import aerys.minko.type.enum.TriangleCulling;
 	import aerys.minko.type.jiglib.JiglibPhysics;
-	import aerys.minko.type.log.DebugLevel;
 	import aerys.minko.type.math.Vector4;
 	import aerys.monitor.Monitor;
 	

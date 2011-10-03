@@ -7,7 +7,6 @@ package
 	import aerys.minko.scene.node.mesh.modifier.BVHMeshModifier;
 	import aerys.minko.scene.node.mesh.modifier.NormalMeshModifier;
 	import aerys.minko.scene.node.mesh.primitive.CubeMesh;
-	import aerys.minko.scene.node.texture.ITexture;
 	import aerys.minko.type.math.ConstVector4;
 	
 	import aze.motion.eaze;
@@ -18,7 +17,6 @@ package
 	import flash.media.SoundTransform;
 	import flash.utils.getTimer;
 	
-	import jiglib.collision.CollisionInfo;
 	import jiglib.events.JCollisionEvent;
 	
 	public class LightCube extends BoxSkinGroup
