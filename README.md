@@ -20,4 +20,4 @@ Dependencies
 Contribute
 ----------
 
-`minko-demo-gravity` is GPL-licensed.  Make sure you tell us everything that's wrong!
+`minko-demo-gravity` is LGPL-licensed.  Make sure you tell us everything that's wrong!
