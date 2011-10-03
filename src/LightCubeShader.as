@@ -10,6 +10,17 @@ package
 	
 	import flash.utils.Dictionary;
 	
+	/**
+	 * This shader is a hack. The hack was discovered has an actual bug
+	 * existed in the original lighting shader code. The combination of
+	 * a wrong light attenuation and Lambert factor gave this weird result.
+	 * 
+	 * We thought it was very cool so we re-implemented the buggy shader
+	 * in a dedicated effect.
+	 *  
+	 * @author Jean-Marc Le Roux
+	 * 
+	 */
 	public class LightCubeShader extends ActionScriptShader
 	{
 		override protected function getOutputColor() : SValue
@@ -28,9 +39,11 @@ package
 				var lightDirection	: SValue	= normalize(lightToPoint);
 				var lambertFactor	: SValue	= saturate(interpolate(vertexNormal).dotProduct3(lightDirection));
 				
+				// hacky hacky...
 				var attenuation		: SValue	= saturate(multiply(squareLocalDist,
 														   reciprocal(dotProduct3(lightToPoint, lightToPoint))));
 				
+				// here goes the hack again...
 				lightDiffuse.scaleBy(attenuation)
 							.scaleBy(.8);
 				illumination.incrementBy(lightDiffuse);
