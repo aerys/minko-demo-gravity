@@ -65,7 +65,7 @@ package
 		private var _viewport	: Viewport			= new Viewport();
 		private var _camera		: FirstPersonCamera	= new FirstPersonCamera();
 		private var _cubes		: MaterialGroup		= new MaterialGroup(new LightCubeEffect(), CUBE_TEXTURE);
-		private var _light		: PointLight		= new PointLight(0xffffff, .08, 0, 0, new Vector4(0., 10., 0.), 50.);
+		private var _light		: PointLight		= new PointLight(0xffffff, .07, 0, 0, new Vector4(0., 10., 0.), 50.);
 		private var _scene		: StyleGroup		= new StyleGroup(_camera, _light, _cubes);
 	
 		private var _speed		: Point				= new Point();
