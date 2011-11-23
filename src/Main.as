@@ -1,6 +1,8 @@
 package
 {
 	import aerys.minko.render.Viewport;
+	import aerys.minko.render.effect.SinglePassEffect;
+	import aerys.minko.render.effect.SinglePassRenderingEffect;
 	import aerys.minko.render.effect.basic.BasicStyle;
 	import aerys.minko.render.effect.lighting.LightingEffect;
 	import aerys.minko.render.effect.lighting.LightingStyle;
@@ -64,7 +66,7 @@ package
 
 		private var _viewport	: Viewport			= new Viewport();
 		private var _camera		: FirstPersonCamera	= new FirstPersonCamera();
-		private var _cubes		: MaterialGroup		= new MaterialGroup(new LightCubeEffect(), CUBE_TEXTURE);
+		private var _cubes		: MaterialGroup		= new MaterialGroup(new SinglePassRenderingEffect(new LightCubeShader()), CUBE_TEXTURE);
 		private var _light		: PointLight		= new PointLight(0xffffff, .07, 0, 0, new Vector4(0., 10., 0.), 50.);
 		private var _scene		: StyleGroup		= new StyleGroup(_camera, _light, _cubes);
 	
@@ -159,7 +161,7 @@ package
 			createCube(0x0000ff, -2.5, 2.5, -2.5);
 			createCube(0xffff00, -2.5, 2.5, 2.5);
 			
-			_scene.style.set(LightingStyle.LIGHT_ENABLED, 	true);
+			_scene.style.set(LightingStyle.LIGHTS_ENABLED, 	true);
 		}
 		
 		private function initializeInputs() : void
